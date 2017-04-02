@@ -2,14 +2,32 @@ chromRange <- function(i, chr="") {
   eval(parse(text=paste('RangesList("', chr, i,'"=IRanges(start=0, end=268435456L))',sep="")))
 }
 
-bam2fragments <- function(bamFile, X=FALSE, mapq=20) {
+HUMAN.BUILDS=c("hg19")
+MOUSE.BUILDS=c("mm10")
+
+autosomeMaxValue <- function(gbuild) {
+    if(gbuild %in% HUMAN.BUILDS) {
+        return(22)
+    } else if(gbuild %in% MOUSE.BUILDS) {
+        return(19)
+    } else {
+        cat("\n\n    seqDNAcopy:bam2counts:autosomesMaxValue:: FATAL ERROR\n")
+        cat("    Unknown genome build: ",paste0("[",gbuild,"]"),"\n\n\n")
+        stop("FATAL-ERROR[seqDNAcopy:bam2counts:autosomesMaxValue(16)]")
+    }
+}
+
+bam2fragments <- function(bamFile, X=FALSE, mapq=20, gbuild="hg19") {
     # get position, mate position and insert size (fragment length)
     what <- c("pos","mpos","isize")
     # get first mate from properly paired reads which pass QC
     flag=scanBamFlag(isNotPassingQualityControls=FALSE, isPaired=TRUE, isFirstMateRead=TRUE, hasUnmappedMate=FALSE, isDuplicate=FALSE, isSecondaryAlignment=FALSE)
     bam <- list()
     # autosomes
-    for(i in 1:22) {
+
+    maxAutosomeNumber=autosomeMaxValue(gbuild)
+
+    for(i in 1:maxAutosomeNumber) {
         which <- chromRange(i)
         param <- ScanBamParam(flag=flag, which = which, what = what, mapqFilter=mapq)
         # scan the data
@@ -20,7 +38,7 @@ bam2fragments <- function(bamFile, X=FALSE, mapq=20) {
         which <- chromRange("X")
         param <- ScanBamParam(flag=flag, which = which, what = what)
         # scan the data
-        bam[[23]] <- scanBam(bamFile, param=param)[[1]]
+        bam[[maxAutosomeNumber+1]] <- scanBam(bamFile, param=param)[[1]]
     }
     bam
 }
@@ -62,9 +80,9 @@ fragments2dataframe <- function(nbam, tbam, iSizeLim=c(75,750), gbuild="hg19") {
 
 bams2counts <- function(nBamFile, tBamFile, GCcorrect=TRUE, gbuild="hg19", mapq=20, iSizeLim=c(75,750), X=FALSE) {
     # normal bam read data ("pos","mpos","isize")
-    nbam <- bam2fragments(nBamFile, X, mapq)
+    nbam <- bam2fragments(nBamFile, X, mapq, gbuild)
     # tumor bam read data ("pos","mpos","isize")
-    tbam <- bam2fragments(tBamFile, X, mapq)
+    tbam <- bam2fragments(tBamFile, X, mapq, gbuild)
     # get the fragment count in bins centered every 100 bases
     out <- fragments2dataframe(nbam, tbam, iSizeLim, gbuild)
     if (GCcorrect) {
