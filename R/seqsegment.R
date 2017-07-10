@@ -1,5 +1,5 @@
 seqsegment <-
-function(fcounts, sampleid="SeqSample", minBinCount=15, binSize=1000) {
+function(fcounts, sampleid="SeqSample", minBinCount=15, binSize=1000, ...) {
     # collapse the 100 base bins according to binsize
     fcounts$bins <- fcounts$chrom + floor(fcounts$pos/binSize)*binSize/2^28
     # data corresponding to the new bins
@@ -22,6 +22,6 @@ function(fcounts, sampleid="SeqSample", minBinCount=15, binSize=1000) {
     zwts <- log2(zz[,"normal"]+1-minBinCount)
 
     zcna <- CNA(as.matrix(zlr), zchr, zpos, sampleid=sampleid)
-    zout <- segment(zcna, weights=zwts)
+    zout <- segment(zcna, weights=zwts, ...)
     zout
 }
