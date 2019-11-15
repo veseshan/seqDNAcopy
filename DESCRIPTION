@@ -1,11 +1,11 @@
 Package: seqDNAcopy
 Type: Package
 Title: Copy number data analysis using DNA sequencing data
-Version: 0.0.1
-Date: 2017-01-20
+Version: 0.0.3
+Date: 2017-04-02
 Author: Venkatraman E. Seshan
 Maintainer: Venkatraman E. Seshan <seshanv@mskcc.org>
-Description: Implements the CBS algorithm for sequencing data.
+Description: Implements the CBS algorithm for sequencing data. (Update for Mouse [nds])
 License: GPL (>= 2)
 biocViews: Microarray, CopyNumberVariation
 Depends: R (>= 2.10), pctGCdata (>= 0.2.0)
