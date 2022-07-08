@@ -2,7 +2,7 @@ chromRange <- function(i, chr="") {
   eval(parse(text=paste('IRanges::IRangesList("', chr, i,'"=IRanges(start=0, end=268435456L))',sep="")))
 }
 
-HUMAN.BUILDS=c("hg19")
+HUMAN.BUILDS=c("hg19","hg38")
 MOUSE.BUILDS=c("mm10")
 
 autosomeMaxValue <- function(gbuild) {
